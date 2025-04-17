@@ -10,7 +10,7 @@ public class Player {
 
         while (true) {
             System.out.println("Actions:");
-            System.out.println("1. Place O");
+            System.out.println("1. Place");
             System.out.println("2. Save and Exit");
 
             System.out.print("Enter your action: ");
@@ -24,8 +24,9 @@ public class Player {
                     row = scanner.nextInt();
                     System.out.print("Enter column (0-14): ");
                     col = scanner.nextInt();
-              table.setO(row,col);
-table.printBoard();
+                  table.setO(row,col);
+                  table.checkWin(row,col);
+            table.printBoard();
 
                     break;
 
