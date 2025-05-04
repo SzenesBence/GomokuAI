@@ -19,6 +19,7 @@ public class Menu {
                 table.createBoard();
                 table.printBoard();
                 player.playerMenu();
+                
 
             }
             case 2 -> {

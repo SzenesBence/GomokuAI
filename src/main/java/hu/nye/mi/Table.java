@@ -1,10 +1,17 @@
 package hu.nye.mi;
 
 public class Table {
-    public static final int SIZE = 15;
-    public static final char[][] board = new char[SIZE][SIZE];
+    public static int SIZE = 15;
+    public static char[][] board = new char[SIZE][SIZE];
+
+
+    public static char[][] getBoard() {
+        return board;
+    }
 
     public void createBoard() {
+
+
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j <SIZE; j++) {
     board[i][j]='-';
