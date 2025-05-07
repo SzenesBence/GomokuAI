@@ -31,8 +31,10 @@ public class Player {
                     System.out.print("Enter column (0-14): ");
                     col = scanner.nextInt();
                   table.setO(row,col);
-                  table.checkWin(row,col);
-               ai.setX();
+                    table.checkWin(row,col);
+               //  ai.aiFirstMove(row,col);
+                    ai.blockPlayer();
+                    table.checkWin(row,col);
                   //OPlaced(row,col);
                   //getoPlacements();
 

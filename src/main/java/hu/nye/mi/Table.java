@@ -1,17 +1,12 @@
 package hu.nye.mi;
 
+
 public class Table {
     public static int SIZE = 15;
     public static char[][] board = new char[SIZE][SIZE];
-
-
-    public static char[][] getBoard() {
-        return board;
-    }
+    public static int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
 
     public void createBoard() {
-
-
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j <SIZE; j++) {
     board[i][j]='-';
@@ -27,10 +22,6 @@ public class Table {
         }
     }
     public boolean isAvailable(int row, int col) {
-        if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) {
-            System.out.println("Invalid coordinates! Out of bounds.");
-            return false;
-        }
 
         if (board[row][col] != '-') {
             System.out.println("Space is taken!");
@@ -39,22 +30,25 @@ public class Table {
 
         return true;
     }
+    public boolean isInBounds(int row, int col) {
+        return row >= 0 && row < Table.SIZE && col >= 0 && col < Table.SIZE;
+    }
 
-  public void setO(int row,int col){
-        if(isAvailable(row,col)) {
+  public void setO(int row,int col) {
+        if(isAvailable(row,col)&&isInBounds(row,col)) {
             board[row][col] = 'O';
             if (checkWin(row, col)) {
                 System.out.println("Player O wins!");
+
             }
         }
+
   }
 
     public static boolean checkWin(int row, int col) {
         char current = board[row][col];
         if (current == '-') return false;
 
-
-        int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
 
         for (int[] dir : directions) {
             int count = 1;
@@ -71,7 +65,7 @@ public class Table {
 
         return false;
     }
-    private static int countConsecutive(int row, int col, int rowDir, int colDir, char player) {
+    public static int countConsecutive(int row, int col, int rowDir, int colDir, char player) {
         int count = 0;
         int r = row + rowDir;
         int c = col + colDir;
