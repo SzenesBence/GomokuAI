@@ -3,8 +3,9 @@ package hu.nye.mi;
 import java.util.Scanner;
 
 public class Menu {
-    public void displayMenu() {
     Scanner scanner = new Scanner(System.in);
+    public void displayMenu() {
+
 
     while (true) {
         System.out.println("1.Play");
@@ -24,12 +25,16 @@ public class Menu {
             }
             case 2 -> {
                 System.out.println("Exiting the program. Goodbye,");
-                scanner.close();
-                System.exit(0);
+               closeScanner();
+
             }
 
             default -> System.out.println("Invalid choice. Please enter a number between 1 and 6.");
         }
     }
+}
+public void closeScanner(){
+        scanner.close();
+    System.exit(0);
 }
 }

@@ -1,47 +1,136 @@
 package hu.nye.mi;
-import static hu.nye.mi.Table.board;
-import static hu.nye.mi.Table.checkWin;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+import static hu.nye.mi.Table.*;
 
 public class AI {
     Table table = new Table();
-    public int aiScore=1;
-    public int playerScore=-1;
-    public int tie=0;
-    public void setX() {
+//getscorral van a gond, rossz a heurisztikai érték
 
+    public static int minimax(Table table, int depth, boolean isMax) {
+        int boardVal = getScore(table);
+        if (table.checkWin('X')) return 10000;  // AI wins
+        if (table.checkWin('O')) return -10000; // Player wins
+        if ( depth == 0 || table.anyMovesAvailable()) {
+            return boardVal;
+        }
 
-        int bestRow =-1;
-        int bestCol =-1;
-
-        // This will be replaced by minimax score later
-        for (int i = 0; i < Table.SIZE; i++) {
-            for (int j = 0; j < Table.SIZE; j++) {
-                if (table.isAvailable(i, j)) {
-                    // Pick first available cell for now (replace with Minimax later)
-                    bestRow = i;
-                    bestCol = j;
-                    break; // Remove this break if you want smarter scanning
+        if (isMax) {
+            int highestVal = Integer.MIN_VALUE;
+            for (int row = 0; row < SIZE; row++) {
+                for (int col = 0; col < SIZE; col++) {
+                    if (table.isAvailable(row, col)) {
+                        board[row][col] = 'X';
+                        int value = minimax(table, depth - 1, false);
+                        board[row][col] = '-';
+                        highestVal = Math.max(highestVal, value);
+                    }
                 }
             }
-            if (bestRow != -1) break;
+            return highestVal;
         }
-
-        // Place X on the board if a valid move was found(safety check)
-        if (bestRow != -1 && bestCol != -1) {
-            board[bestRow][bestCol] = 'X';
-            System.out.println("AI placed X at: " + bestRow + "," + bestCol);
-            if (checkWin(bestRow, bestCol)) {
-                System.out.println("Player X wins!");
+        // Minimising player (opponent's turn)
+        else {
+            int lowestVal = Integer.MAX_VALUE;
+            for (int row = 0; row < SIZE; row++) {
+                for (int col = 0; col < SIZE; col++) {
+                    if (table.isAvailable(row, col)) {
+                        board[row][col] = 'O'; // Try opponent move
+                        int value = minimax(table, depth - 1, true);
+                        board[row][col] = '-'; // Undo move
+                        lowestVal = Math.min(lowestVal, value);
+                    }
+                }
             }
-        } else {
-            System.out.println("AI: No valid moves left.");
+            return lowestVal;
         }
     }
 
-    private int minimax(char[][] board,int depth,boolean isMaximizing) {
-        return 0;
+    public static int[] getBestMove(Table table) {
+        int[] bestMove = new int[]{-1, -1};
+        int bestValue = Integer.MIN_VALUE;
+
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (table.isAvailable(row, col)) {
+                    board[row][col] = 'X'; // Try move
+                    int moveValue = minimax(table, 6, false); // Evaluate
+                    board[row][col] = '-'; // Undo move
+                    if (moveValue > bestValue) {
+                        bestMove[0] = row;
+                        bestMove[1] = col;
+                        bestValue = moveValue;
+                    }
+                }
+            }
+        }
+        return bestMove;
     }
 
+    public void setX() {
+        int[] move = getBestMove(table);
+        if (move[0] != -1 && move[1] != -1) {
+            board[move[0]][move[1]] = 'X';
+        }
+        if(checkWin('X')){
+            System.out.println("X WINS!");
+        Menu menu=new Menu();
+        menu.closeScanner();
+        System.exit(0);
+        }
+    }
+
+
+
+
+    public static int getScore(Table table){
+    char AIchar = 'X';
+    char Playerchar='O';
+
+
+ int heuristicScore=0;
+
+    for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+            if (board[row][col] == AIchar) {
+                for (int[] dir : table.directions) {
+                    int count = table.countConsecutive(row, col, dir[0], dir[1], AIchar);
+
+                    if (count == 4) {
+                        heuristicScore += 500;
+                    } else if (count == 3) {
+                        heuristicScore += 100;
+                    } else if (count == 2) {
+                        heuristicScore += 30;
+                    } else if (count == 1) {
+                       heuristicScore += 10;
+                    }
+
+                }
+            }
+            if (board[row][col] == Playerchar) {
+                for (int[] dir : table.directions) {
+                    int count = table.countConsecutive(row, col, dir[0], dir[1], Playerchar);
+                    if (count == 4) {
+                        heuristicScore -= 500;
+                    } else if (count == 3) {
+                       heuristicScore -= 100;
+                    } else if (count == 2) {
+                        heuristicScore -= 30;
+                    } else if (count == 1) {
+                        heuristicScore -= 10;
+                    }
+
+                }
+            }
+        }
+    }
+    return heuristicScore;
+
+}
+/*
 
     public void blockPlayer() {
         char player = 'O';
@@ -75,7 +164,7 @@ public class AI {
             }
         }
     }
-    /*
+    */
     public final void aiFirstMove(int row, int col){
         int min=-1;
         int max=1;
@@ -96,7 +185,8 @@ public class AI {
 
     }
 
-     */
+
 
 
 }
+

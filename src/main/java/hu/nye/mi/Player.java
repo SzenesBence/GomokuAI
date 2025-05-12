@@ -31,10 +31,14 @@ public class Player {
                     System.out.print("Enter column (0-14): ");
                     col = scanner.nextInt();
                   table.setO(row,col);
-                    table.checkWin(row,col);
-               //  ai.aiFirstMove(row,col);
-                    ai.blockPlayer();
-                    table.checkWin(row,col);
+                    table.checkWin('O');
+                   // ai.aiFirstMove(row,col);
+
+                   ai.setX();
+
+                   // ai.blockPlayer();
+                    table.checkWin('X');
+                    //AI.getBestMove(table);
                   //OPlaced(row,col);
                   //getoPlacements();
 
