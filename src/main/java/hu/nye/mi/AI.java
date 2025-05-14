@@ -5,14 +5,13 @@ import static hu.nye.mi.Table.*;
 public class AI {
     Table table = new Table();
 
-//getscorral van a gond, rossz a heurisztikai érték
 
     public static int minimax(Table table, int depth,int alpha, int beta, boolean isMax) {
 
         int boardVal = getScore();
 
-        if (checkWin('X')) return 10000;  // AI wins
-        if (checkWin('O')) return -10000; // Player wins
+        if (checkWin('X')) return 10000;
+        if (checkWin('O')) return -10000;
         if (Math.abs(boardVal) >= 100000 || depth == 0 || !table.anyMovesAvailable()) {
             return boardVal;
         }
@@ -78,17 +77,19 @@ public class AI {
     }
 
     public void setX() {
-
+        Menu menu=new Menu();
         int[] move = getBestMove(table);
         if (move[0] != -1 && move[1] != -1) {
             board[move[0]][move[1]] = 'X';
+           table.availableMoves--;
         }
         if(checkWin('X')){
             System.out.println("X WINS!");
-        Menu menu=new Menu();
+            table.printBoard();
         menu.endGame();
-
         }
+
+
     }
 
 
@@ -101,7 +102,6 @@ public class AI {
 
         int score = 0;
 
-        // Evaluate all positions
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 // Evaluate X opportunities
@@ -113,7 +113,7 @@ public class AI {
                         else if (count == 2) score += 100;   // Potential
                     }
                 }
-                // Evaluate O threats
+
                 else if (board[row][col] == 'O') {
                     for (int[] dir : directions) {
                         int count = countConsecutive(row, col, dir[0], dir[1], 'O');
@@ -126,42 +126,6 @@ public class AI {
         }
         return score;
     }
-
-/*
-    public void blockPlayer() {
-        char player = 'O';
-
-        for (int row = 0; row < Table.SIZE; row++) {
-            for (int col = 0; col < Table.SIZE; col++) {
-                if (board[row][col] == player) {
-                    for (int[] dir : directions) {
-                        int count = countConsecutive(row, col, dir[0], dir[1], player);
-
-                        if (count >= 2) {
-
-                            int endRow1 = row + dir[0] * (count + 1);
-                            int endCol1 = col + dir[1] * (count + 1);
-
-                            int endRow2 = row - dir[0];
-                            int endCol2 = col - dir[1];
-
-                            if (table.isInBounds(endRow1, endCol1) && table.isAvailable(endRow1, endCol1)) {
-                                board[endRow1][endCol1] = 'X';
-                                return;
-                            }
-
-                            if (table.isInBounds(endRow2, endCol2) && table.isAvailable(endRow2, endCol2)) {
-                                board[endRow2][endCol2] = 'X';
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
- */
 
 
 

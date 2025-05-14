@@ -41,11 +41,10 @@ public class Player {
                         System.out.println("Space is taken!");
                         break;
                     }
-
                    ai.setX();
                     table.checkWin('O');
                     table.checkWin('X');
-            table.printBoard();
+                     table.printBoard();
 
                     break;
 

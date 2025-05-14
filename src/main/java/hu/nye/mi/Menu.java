@@ -10,6 +10,7 @@ import static hu.nye.mi.Table.board;
 
 public class Menu {
     Scanner scanner = new Scanner(System.in);
+    Table table= new Table();
     public void displayMenu() {
 
         Player player= new Player();
@@ -47,6 +48,7 @@ public class Menu {
     }
 }
 public void endGame(){
+
         scanner.close();
     System.exit(0);
 }
@@ -55,7 +57,6 @@ public void endGame(){
         String filePath = "C:\\JAVA GYAKORLATOK\\Gomoku\\src\\main\\resources\\" + filename + ".txt";
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-
 
 
             String line;
