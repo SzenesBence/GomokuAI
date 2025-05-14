@@ -3,7 +3,7 @@ package hu.nye.mi;
 
 
 public class Table {
-    public static int SIZE = 15;
+    public static int SIZE = 5;
     public static char[][] board = new char[SIZE][SIZE];
     public static int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
     public int availableMoves = SIZE * SIZE;
@@ -25,7 +25,6 @@ public class Table {
     public boolean isAvailable(int row, int col) {
 
         if (board[row][col] != '-') {
-            System.out.println("Space is taken!");
             return false;
         }
 
@@ -38,18 +37,19 @@ public class Table {
         return row >= 0 && row < Table.SIZE && col >= 0 && col < Table.SIZE;
     }
 
-  public void setO(int row,int col) {
-        if(isAvailable(row,col)&&isInBounds(row,col)) {
+    public void setO(int row, int col) {
+board[row][col]='O';
 
-            if (checkWin('O')) {
-                System.out.println("Player O wins!");
+            if(checkWin('O')){
+                System.out.println("O WINS!");
                 Menu menu=new Menu();
-                menu.closeScanner();
+                menu.endGame();
                 System.exit(0);
             }
-        }
+            // If this is the FIRST 'O', make AI respond
 
-  }
+
+    }
 
     public static boolean checkWin(char player) {
 
@@ -79,5 +79,9 @@ public class Table {
         }
         return count;
     }
+
+
   }
+
+
 

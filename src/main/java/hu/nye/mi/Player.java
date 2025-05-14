@@ -1,8 +1,12 @@
 package hu.nye.mi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
+
+import static hu.nye.mi.Table.SIZE;
+import static hu.nye.mi.Table.board;
 
 public class Player {
     public int row;
@@ -26,65 +30,56 @@ public class Player {
                     Table table = new Table();
                     AI ai=new AI();
                     System.out.println("Pick a place to set 'O'  by row and column");
-                    System.out.print("Enter row (0-14): ");
+                    System.out.print("Enter row (0-4): ");
                     row = scanner.nextInt();
-                    System.out.print("Enter column (0-14): ");
+                    System.out.print("Enter column (0-4): ");
                     col = scanner.nextInt();
-                  table.setO(row,col);
-                    table.checkWin('O');
-                   // ai.aiFirstMove(row,col);
+                    if(table.isAvailable(row,col)) {
+                        table.setO(row, col);
+
+                    }else {
+                        System.out.println("Space is taken!");
+                        break;
+                    }
 
                    ai.setX();
-
-                   // ai.blockPlayer();
+                    table.checkWin('O');
                     table.checkWin('X');
-                    //AI.getBestMove(table);
-                  //OPlaced(row,col);
-                  //getoPlacements();
-
             table.printBoard();
 
                     break;
 
                 case 2:
                     System.out.println("Game Save and Exit");
-                    scanner.close();
+        save("game1");
+       Menu menu=new Menu();
+        menu.displayMenu();
                     System.out.println("Exiting the program. Goodbye,");
                     System.exit(0);
                     break;
 
 
                 default:
-                    System.out.println("Invalid action. Please enter a number between 1 and 6.");
+                    System.out.println("Invalid action. Please enter a number between 1 and 2.");
                     break;
             }
         }
     }
-    public int getCol() {
-        return col;
-    }
 
-    public int getRow() {
-        return row;
-    }
-/*
-    private final static List<int[]> oPlacements = new ArrayList<>();
+    public void save(String filename) {
 
-    public void OPlaced(int row, int col) {
-        oPlacements.add(new int[]{row, col});
-        printPlacements();
-    }
+        String filePath = "C:\\JAVA GYAKORLATOK\\Gomoku\\src\\main\\resources\\" + filename + ".txt";
 
-    private void printPlacements() {
-        for (int[] placement : oPlacements) {
-            System.out.println("[" + placement[0] + ", " + placement[1] + "]");
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    writer.print(board[i][j]);
+                }
+                writer.println();
+            }
+            System.out.println("Game saved to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Save failed: " + e.getMessage());
         }
     }
-
-    public List<int[]> getoPlacements() {
-        return oPlacements;
-    }
-
- */
-
 }
