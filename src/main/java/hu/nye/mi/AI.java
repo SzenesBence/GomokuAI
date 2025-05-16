@@ -54,17 +54,46 @@ public class AI {
     }
 
     public static int[] getBestMove(Table table) {
+       //megnézi hogy egyből nyerhet-e
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (table.isAvailable(row, col)) {
+                    board[row][col] = 'X';
+                    if (checkWin('X')) {
+                        board[row][col] = '-';
+                        return new int[]{row, col};
+                    }
+                    board[row][col] = '-';
+                }
+            }
+        }
+
+        // blokkol  ha a játékosnak 4 érintkezik
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (table.isAvailable(row, col)) {
+                    board[row][col] = 'O';
+                    if (checkWin('O')) {
+                        board[row][col] = '-';
+                        return new int[]{row, col};
+                    }
+                    board[row][col] = '-';
+                }
+            }
+        }
+
+
         int[] bestMove = new int[]{-1, -1};
         int bestValue = Integer.MIN_VALUE;
-
 
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 if (table.isAvailable(row, col)) {
-                    board[row][col] = 'X'; // Try move
-                    int moveValue = minimax(table, 3,Integer.MIN_VALUE,
+                    board[row][col] = 'X';
+                    int moveValue = minimax(table, 3, Integer.MIN_VALUE,
                             Integer.MAX_VALUE, false);
-                    board[row][col] = '-'; // Undo move
+                    board[row][col] = '-';
+
                     if (moveValue > bestValue) {
                         bestMove[0] = row;
                         bestMove[1] = col;
@@ -81,6 +110,7 @@ public class AI {
         int[] move = getBestMove(table);
         if (move[0] != -1 && move[1] != -1) {
             board[move[0]][move[1]] = 'X';
+            System.out.println("AI MOVE: "+move[0]+","+move[1]);
            table.availableMoves--;
         }
         if(checkWin('X')){
@@ -96,30 +126,31 @@ public class AI {
 
 
     public static int getScore() {
-        // Immediate win/loss checks
-        if (checkWin('X')) return 1000000;  // AI wins
-        if (checkWin('O')) return -1000000; // Player wins
+
+        if (checkWin('X')) return 1000000;  // AI nyer
+        if (checkWin('O')) return -1000000; // Player nyer
 
         int score = 0;
 
+
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                // Evaluate X opportunities
+
                 if (board[row][col] == 'X') {
                     for (int[] dir : directions) {
                         int count = countConsecutive(row, col, dir[0], dir[1], 'X');
-                        if (count >= 4) score += 100000;  // Immediate win
-                        else if (count == 3) score += 10000; // Strong threat
-                        else if (count == 2) score += 100;   // Potential
+                        if (count >= 4) score += 100000;  // nyerés
+                        else if (count == 3) score += 10000; // fenyegetés
+                        else if (count == 2) score += 100;    // lehetőség
                     }
                 }
-
+                // Evaluate O threats (heavier penalties)
                 else if (board[row][col] == 'O') {
                     for (int[] dir : directions) {
                         int count = countConsecutive(row, col, dir[0], dir[1], 'O');
-                        if (count >= 4) score -= 200000;  // Must block!
-                        else if (count == 3) score -= 50000; // Critical block
-                        else if (count == 2) score -= 1000;  // Developing threat
+                        if (count >= 4) score -= 300000;  // muszáj blokkolni
+                        else if (count == 3)score -= 100000; // kritikus
+                        else if (count == 2) score -= 1000;   // veszély esélye
                     }
                 }
             }

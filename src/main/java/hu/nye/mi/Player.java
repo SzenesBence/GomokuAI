@@ -42,6 +42,8 @@ public class Player {
                         break;
                     }
                    ai.setX();
+
+
                     table.checkWin('O');
                     table.checkWin('X');
                      table.printBoard();
