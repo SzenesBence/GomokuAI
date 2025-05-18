@@ -7,7 +7,7 @@ public class Table {
     public static int SIZE = 5;
     public static char[][] board = new char[SIZE][SIZE];
     public static int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
-    public int availableMoves = SIZE * SIZE;
+    public static int availableMoves = SIZE * SIZE;
     public void createBoard() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j <SIZE; j++) {
@@ -43,8 +43,12 @@ public class Table {
                 printBoard();
                 menu.endGame();
                 System.exit(0);
-
             }
+        if(availableMoves<=0){
+            System.out.println("TIE");
+          printBoard();
+            menu.endGame();
+        }
 
 
     }

@@ -10,7 +10,6 @@ import static hu.nye.mi.Table.board;
 
 public class Menu {
     Scanner scanner = new Scanner(System.in);
-    Table table= new Table();
     public void displayMenu() {
 
         Player player= new Player();

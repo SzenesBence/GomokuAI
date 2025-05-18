@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-import static hu.nye.mi.Table.SIZE;
-import static hu.nye.mi.Table.board;
+import static hu.nye.mi.Table.*;
 
 public class Player {
     public int row;
@@ -26,43 +25,35 @@ public class Player {
             int actionChoice = scanner.nextInt();
 
             switch (actionChoice) {
-                case 1:
+                case 1 -> {
                     Table table = new Table();
-                    AI ai=new AI();
+                    AI ai = new AI();
                     System.out.println("Pick a place to set 'O'  by row and column");
                     System.out.print("Enter row (0-4): ");
                     row = scanner.nextInt();
                     System.out.print("Enter column (0-4): ");
                     col = scanner.nextInt();
-                    if(table.isAvailable(row,col)) {
+                    if (table.isAvailable(row, col)) {
                         table.setO(row, col);
 
-                    }else {
+                    } else {
                         System.out.println("Space is taken!");
                         break;
                     }
-                   ai.setX();
-
-
-                    table.checkWin('O');
-                    table.checkWin('X');
-                     table.printBoard();
-
-                    break;
-
-                case 2:
+                    ai.setX();
+                    checkWin('O');
+                    checkWin('X');
+                    table.printBoard();
+                }
+                case 2 -> {
                     System.out.println("Game Save and Exit");
-        save("game1");
-       Menu menu=new Menu();
-        menu.displayMenu();
+                    save("game1");
+                    Menu menu = new Menu();
+                    menu.displayMenu();
                     System.out.println("Exiting the program. Goodbye,");
                     System.exit(0);
-                    break;
-
-
-                default:
-                    System.out.println("Invalid action. Please enter a number between 1 and 2.");
-                    break;
+                }
+                default -> System.out.println("Invalid action. Please enter a number between 1 and 2.");
             }
         }
     }
