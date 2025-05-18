@@ -10,24 +10,30 @@ public class Table {
     public static int availableMoves = SIZE * SIZE;
     public void createBoard() {
         for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j <SIZE; j++) {
-    board[i][j]='-';
+            for (int j = 0; j < SIZE; j++) {
+                board[i][j] = '-';
             }
         }
     }
     public void printBoard() {
-        for (char[] chars : board) {
-            for (char aChar : chars) {
-                System.out.print(aChar + " ");
+
+        System.out.print("   ");
+        for (int j = 0; j < SIZE; j++) {
+            System.out.print(j + " ");
+        }
+        System.out.println();
+
+
+        for (int i = 0; i < SIZE; i++) {
+            System.out.print(i + (i < 10 ? "  " : " "));
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
             }
             System.out.println();
         }
     }
     public boolean isAvailable(int row, int col) {
-        if (board[row][col] != '-') {
-            return false;
-        }
-        return true;
+        return board[row][col] == '-';
     }
     public boolean anyMovesAvailable() {
         return availableMoves == 0;
@@ -45,7 +51,7 @@ public class Table {
                 System.exit(0);
             }
         if(availableMoves<=0){
-            System.out.println("TIE");
+            System.out.println("TIE!");
           printBoard();
             menu.endGame();
         }
@@ -74,14 +80,14 @@ public class Table {
         int r = row + rowDir;
         int c = col + colDir;
 
-        while (r >= 0 && r < SIZE && c >= 0 && c < SIZE && board[r][c] == player) {
+        while (r >= 0 && r < SIZE && c >= 0 && c < SIZE &&
+                board[r][c] == player) {
             count++;
             r += rowDir;
             c += colDir;
         }
         return count;
     }
-
 
   }
 

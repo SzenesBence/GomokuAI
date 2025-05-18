@@ -40,10 +40,12 @@ public class Player {
                         System.out.println("Space is taken!");
                         break;
                     }
+
                     ai.setX();
                     checkWin('O');
                     checkWin('X');
                     table.printBoard();
+
                 }
                 case 2 -> {
                     System.out.println("Game Save and Exit");

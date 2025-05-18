@@ -67,6 +67,8 @@ public void endGame(){
                 row++;
             }
             System.out.println("Game loaded from " + filePath);
+            Table table= new Table();
+            table.printBoard();
         } catch (IOException e) {
             System.err.println("Load failed: " + e.getMessage());
         }

@@ -53,103 +53,45 @@ public class AI {
         }
     }
 
-    public static int[] getBestMove(Table table) {
-        // nyerhet-e egyből?
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                if (table.isAvailable(row, col)) {
-                    board[row][col] = 'X';
-                    if (checkWin('X')) {
-                        board[row][col] = '-';
-                        return new int[]{row, col};
-                    }
-                    board[row][col] = '-';
-                }
-            }
-        }
+    public static int getScore() {
+        if (checkWin('X')) return 1000000;
+        if (checkWin('O')) return -1000000;
 
-        // 2. játékos nyerhet?
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                if (table.isAvailable(row, col)) {
-                    board[row][col] = 'O';
-                    if (checkWin('O')) {
-                        board[row][col] = '-';
-                        return new int[]{row, col};
-                    }
-                    board[row][col] = '-';
-                }
-            }
-        }
-
-        //3. ai nyitás a centrumban lévő nyitásokat preferálja
-        if (isOpeningGame()) {
-
-            int[][] goodStarts = {{2,2}, {1,1}, {1,3}, {3,1}, {3,3}};
-            for (int[] pos : goodStarts) {
-                if (table.isAvailable(pos[0], pos[1])) {
-                    return pos;
-                }
-            }
-        }
-
-        // 4. Minimax, határok figyelembe vételével
-        int[] bestMove = new int[]{-1, -1};
-        int bestValue = Integer.MIN_VALUE;
+        int score = 0;
 
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
-                if (table.isAvailable(row, col)) {
-                    // potencionális lépések
-                    if (hasPotential(row, col)) {
-                        board[row][col] = 'X';
-                        int moveValue = minimax(table, 3, Integer.MIN_VALUE,
-                                Integer.MAX_VALUE, false);
-                        board[row][col] = '-';
+                if (board[row][col] != '-') {
+                    char player = board[row][col];
+                    boolean isAI = (player == 'X');
 
-                        if (moveValue > bestValue) {
-                            bestMove[0] = row;
-                            bestMove[1] = col;
-                            bestValue = moveValue;
+                    for (int[] dir : directions) {
+
+                        if (canFormFive(row, col, dir)) {
+                            int count = 1 +
+                                    countConsecutive(row, col, dir[0], dir[1], player) +
+                                    countConsecutive(row, col, -dir[0], -dir[1], player);
+
+                            if (isAI) {
+                                if (count >= 4) score += 100000;
+                                else if (count == 3) score += 10000;
+                            } else {
+                                if (count >= 4) score -= 300000;
+                                else if (count == 3) score -= 100000;
+                            }
                         }
                     }
                 }
             }
         }
-
-        // Visszalép nem talál legjobb lépést
-        if (bestMove[0] == -1) {
-            for (int row = 0; row < SIZE; row++) {
-                for (int col = 0; col < SIZE; col++) {
-                    if (table.isAvailable(row, col)) {
-                        return new int[]{row, col};
-                    }
-                }
-            }
-        }
-
-        return bestMove;
+        return score;
     }
 
-    private static boolean isOpeningGame() {
-        int movesPlayed = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] != '-') movesPlayed++;
-            }
-        }
-        return movesPlayed < 4;
-    }
-
-    private static boolean hasPotential(int row, int col) {
-        // megnézzük, hogy a pozíció részese bármelyik potencionális vonalnak
-        for (int[] dir : directions) {
-            int potential = 1; // jelenlegi pozíció
-            potential += countPotential(row, col, dir[0], dir[1]);
-            potential += countPotential(row, col, -dir[0], -dir[1]);
-            if (potential >= 5) return true;
-        }
-        return false;
+    public static boolean canFormFive(int row, int col, int[] dir) {
+        int potential = 1;
+        potential += countPotential(row, col, dir[0], dir[1]);
+        potential += countPotential(row, col, -dir[0], -dir[1]);
+        return potential >= 5;
     }
 
     private static int countPotential(int row, int col, int rowDir, int colDir) {
@@ -157,24 +99,43 @@ public class AI {
         int r = row + rowDir;
         int c = col + colDir;
 
-        while (r >= 0 && r < SIZE && c >= 0 && c < SIZE) {
-            if (board[r][c] == 'X' || board[r][c] == '-') {
-                count++;
-            } else {
-                break;
-            }
+        while (r >= 0 && r < SIZE && c >= 0 && c < SIZE &&
+                (board[r][c] == '-' || board[r][c] == board[row][col])) {
+            count++;
             r += rowDir;
             c += colDir;
         }
         return count;
     }
+    public static int[] getBestMove(Table table) {
+        int[] bestMove = new int[]{-1, -1};
+        int bestValue = Integer.MIN_VALUE;
 
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (table.isAvailable(row, col)) {
+                    board[row][col] = 'X';
+                    int moveValue = minimax(table, 4, Integer.MIN_VALUE,
+                            Integer.MAX_VALUE, false);
+                    board[row][col] = '-';
+
+                    if (moveValue > bestValue) {
+                        bestMove[0] = row;
+                        bestMove[1] = col;
+                        bestValue = moveValue;
+                    }
+                }
+            }
+        }
+        return bestMove;
+    }
     public void setX() {
         Menu menu=new Menu();
         int[] move = getBestMove(table);
         if (move[0] != -1 && move[1] != -1) {
             board[move[0]][move[1]] = 'X';
             System.out.println("AI MOVE: "+move[0]+","+move[1]);
+
            availableMoves--;
         }
         if(checkWin('X')){
@@ -184,7 +145,7 @@ public class AI {
         }
 
         if(availableMoves<=0){
-            System.out.println("TIE");
+            System.out.println("TIE!");
             table.printBoard();
             menu.endGame();
         }
@@ -195,38 +156,6 @@ public class AI {
 
 
 
-    public static int getScore() {
-
-        if (checkWin('X')) return 1000000;  // AI nyer
-        if (checkWin('O')) return -1000000; // Player nyer
-
-        int score = 0;
-
-
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-
-                if (board[row][col] == 'X') {
-                    for (int[] dir : directions) {
-                        int count =  countConsecutive(row, col, dir[0], dir[1], 'X');
-                        if (count >= 4) score += 100000;  // nyerés
-                        else if (count == 3) score += 10000; // fenyegetés
-                        else if (count == 2) score += 100;    // lehetőség
-                    }
-                }
-
-                else if (board[row][col] == 'O') {
-                    for (int[] dir : directions) {
-                        int count = countConsecutive(row, col, dir[0], dir[1], 'O');
-                        if (count >= 4) score -= 300000;  // muszáj blokkolni
-                        else if (count == 3)score -= 100000; // kritikus
-                        else if (count == 2) score -= 1000;   // veszély esélye
-                    }
-                }
-            }
-        }
-        return score;
-    }
 
 
 
