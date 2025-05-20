@@ -39,9 +39,9 @@ public class AI {
             for (int row = 0; row < SIZE; row++) {
                 for (int col = 0; col < SIZE; col++) {
                     if (table.isAvailable(row, col)) {
-                        board[row][col] = 'O'; // Try opponent move
+                        board[row][col] = 'O';
                         lowestVal=Math.min(lowestVal,minimax(table,depth-1,alpha,beta,true));
-                        board[row][col] = '-'; // Undo move
+                        board[row][col] = '-';
                         beta=Math.min(beta,lowestVal);
                         if (beta<=alpha){
                             return lowestVal;
@@ -75,6 +75,7 @@ public class AI {
                             if (isAI) {
                                 if (count >= 4) score += 100000;
                                 else if (count == 3) score += 10000;
+                                else if(count ==2) score += 5000;
                             } else {
                                 if (count >= 4) score -= 300000;
                                 else if (count == 3) score -= 100000;

@@ -14,14 +14,14 @@ public class Menu {
 
         Player player= new Player();
     while (true) {
-        System.out.println("1.Play");
+        System.out.println("1.New Game");
         System.out.println("2.Load and Play");
         System.out.println("3. Exit");
         System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
         switch (choice) {
             case 1 -> {
-                System.out.println("Selected: Play");
+                System.out.println("Selected: New Game");
 
                 Table table = new Table();
                 table.createBoard();

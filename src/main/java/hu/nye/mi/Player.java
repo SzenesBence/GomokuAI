@@ -35,12 +35,11 @@ public class Player {
                     col = scanner.nextInt();
                     if (table.isAvailable(row, col)) {
                         table.setO(row, col);
-
                     } else {
                         System.out.println("Space is taken!");
                         break;
                     }
-
+                    System.out.println("SCORE: "+AI.getScore());
                     ai.setX();
                     checkWin('O');
                     checkWin('X');
