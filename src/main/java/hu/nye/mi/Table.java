@@ -4,7 +4,7 @@ package hu.nye.mi;
 
 public class Table {
 
-    public static int SIZE = 15;
+    public static int SIZE = 5;
     public static char[][] board = new char[SIZE][SIZE];
     public static int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
     public static int availableMoves = SIZE * SIZE;
@@ -36,7 +36,7 @@ public class Table {
         return board[row][col] == '-';
     }
     public boolean anyMovesAvailable() {
-        return availableMoves == 0;
+        return availableMoves <= 0;
     }
 
 

@@ -1,4 +1,5 @@
-package hu.nye.mi;
+
+        package hu.nye.mi;
 
 import static hu.nye.mi.Table.*;
 
@@ -21,7 +22,7 @@ public class AI {
                 for (int col = 0; col < SIZE; col++) {
                     if (table.isAvailable(row, col)) {
                         board[row][col] = 'X';
-                         highestVal =Math.max(highestVal,minimax(table,depth-1,alpha,beta,false));
+                        highestVal =Math.max(highestVal,minimax(table,depth-1,alpha,beta,false));
                         board[row][col] = '-';
                         alpha=Math.max(alpha,highestVal);
                         if (alpha>=beta){
@@ -53,61 +54,6 @@ public class AI {
         }
     }
 
-    public static int getScore() {
-        if (checkWin('X')) return 1000000;
-        if (checkWin('O')) return -1000000;
-
-        int score = 0;
-
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                if (board[row][col] != '-') {
-                    char player = board[row][col];
-                    boolean isAI = (player == 'X');
-
-                    for (int[] dir : directions) {
-
-                        if (canFormFive(row, col, dir)) {
-                            int count = 1 +
-                                    countConsecutive(row, col, dir[0], dir[1], player) +
-                                    countConsecutive(row, col, -dir[0], -dir[1], player);
-
-                            if (isAI) {
-                                if (count >= 4) score += 100000;
-                                else if (count == 3) score += 10000;
-                                else if(count ==2) score += 5000;
-                            } else {
-                                if (count >= 4) score -= 300000;
-                                else if (count == 3) score -= 100000;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return score;
-    }
-
-    public static boolean canFormFive(int row, int col, int[] dir) {
-        int potential = 1;
-        potential += countPotential(row, col, dir[0], dir[1]);
-        potential += countPotential(row, col, -dir[0], -dir[1]);
-        return potential >= 5;
-    }
-
-    private static int countPotential(int row, int col, int rowDir, int colDir) {
-        int count = 0;
-        int r = row + rowDir;
-        int c = col + colDir;
-
-        while (r >= 0 && r < SIZE && c >= 0 && c < SIZE &&
-                (board[r][c] == '-' || board[r][c] == board[row][col])) {
-            count++;
-            r += rowDir;
-            c += colDir;
-        }
-        return count;
-    }
     public static int[] getBestMove(Table table) {
         int[] bestMove = new int[]{-1, -1};
         int bestValue = Integer.MIN_VALUE;
@@ -116,7 +62,20 @@ public class AI {
             for (int col = 0; col < SIZE; col++) {
                 if (table.isAvailable(row, col)) {
                     board[row][col] = 'X';
-                    int moveValue = minimax(table, 4, Integer.MIN_VALUE,
+                    if (checkWin('X')) {
+                        board[row][col] = '-';
+                        return new int[]{row, col};
+                    }
+                    board[row][col] = '-';
+                }
+            }
+        }
+
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (table.isAvailable(row, col)) {
+                    board[row][col] = 'X';
+                    int moveValue = minimax(table, 12, Integer.MIN_VALUE,
                             Integer.MAX_VALUE, false);
                     board[row][col] = '-';
 
@@ -137,12 +96,12 @@ public class AI {
             board[move[0]][move[1]] = 'X';
             System.out.println("AI MOVE: "+move[0]+","+move[1]);
 
-           availableMoves--;
+            availableMoves--;
         }
         if(checkWin('X')){
             System.out.println("X WINS!");
             table.printBoard();
-        menu.endGame();
+            menu.endGame();
         }
 
         if(availableMoves<=0){
@@ -154,11 +113,91 @@ public class AI {
 
     }
 
+    public static int getScore() {
+        // Immediate win/loss checks
+        if (checkWin('X')) return 1_000_000;
+        if (checkWin('O')) return -1_000_000;
 
+        int score = 0;
+        boolean hasPotentialWin = false;
 
+        // Evaluate all positions
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                // Evaluate X opportunities
+                if (board[row][col] == 'X') {
+                    for (int[] dir : directions) {
 
+                        LineInfo info = evaluateLine(row, col, dir, 'X');
+                        if (info.openEnds > 0) { // Only count lines with potential
+                            if (info.count >= 4) {
+                                score += 100_000;
+                                hasPotentialWin = true;
+                            }
 
+                            else if (info.count == 3) score += (info.openEnds == 2) ? 15_000 : 10_000;
+                            else if (info.count == 2) score += (info.openEnds == 2) ? 3_000 : 1_000;
+                        }
+                    }
+                }
+                // Evaluate O threats
+                else if (board[row][col] == 'O') {
+                    for (int[] dir : directions) {
+                        LineInfo info = evaluateLine(row, col, dir, 'O');
+                        if (info.openEnds > 0) {
+                            if (info.count >= 4) score -= 300_000;
+                            else if (info.count == 3) score -= (info.openEnds == 2) ? 50_000 : 30_000;
+                            else if (info.count == 2) score -= (info.openEnds == 2) ? 5_000 : 2_000;
+                        }
+                    }
+                }
+            }
+        }
 
+        // Bonus for center control if no immediate threats
+        if (!hasPotentialWin && board[SIZE/2][SIZE/2] == 'X') {
+            score += 1_000;
+        }
+
+        return score;
+    }
+
+    private static class LineInfo {
+        int count;
+        int openEnds;
+    }
+
+    private static LineInfo evaluateLine(int row, int col, int[] dir, char player) {
+        LineInfo info = new LineInfo();
+        info.count = 1; // Current position
+
+        // Check in positive direction
+        info.openEnds += checkDirection(row, col, dir[0], dir[1], player, info);
+        // Check in negative direction
+        info.openEnds += checkDirection(row, col, -dir[0], -dir[1], player, info);
+
+        return info;
+    }
+
+    private static int checkDirection(int row, int col, int rowDir, int colDir, char player, LineInfo info) {
+        int r = row + rowDir;
+        int c = col + colDir;
+        int openEnd = 0;
+
+        while (r >= 0 && r < SIZE && c >= 0 && c < SIZE) {
+            if (board[r][c] == player) {
+                info.count++;
+            } else if (board[r][c] == '-') {
+                openEnd = 1;
+                break;
+            } else {
+                break; // Blocked by opponent
+            }
+            r += rowDir;
+            c += colDir;
+        }
+        return openEnd;
+    }
 
 
 }
