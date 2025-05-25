@@ -1,5 +1,5 @@
 
-        package hu.nye.mi;
+package hu.nye.mi;
 
 import static hu.nye.mi.Table.*;
 
@@ -11,8 +11,7 @@ public class AI {
 
         int boardVal = getScore();
 
-        if (checkWin('X')) return 10000;
-        if (checkWin('O')) return -10000;
+
         if (Math.abs(boardVal) >= 100000 || depth == 0 || !table.anyMovesAvailable()) {
             return boardVal;
         }
@@ -54,6 +53,9 @@ public class AI {
         }
     }
 
+
+
+
     public static int[] getBestMove(Table table) {
         int[] bestMove = new int[]{-1, -1};
         int bestValue = Integer.MIN_VALUE;
@@ -63,6 +65,19 @@ public class AI {
                 if (table.isAvailable(row, col)) {
                     board[row][col] = 'X';
                     if (checkWin('X')) {
+                        board[row][col] = '-';
+                        return new int[]{row, col};
+                    }
+                    board[row][col] = '-';
+                }
+            }
+        }
+
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (table.isAvailable(row, col)) {
+                    board[row][col] = 'O';
+                    if (checkWin('O')) {
                         board[row][col] = '-';
                         return new int[]{row, col};
                     }

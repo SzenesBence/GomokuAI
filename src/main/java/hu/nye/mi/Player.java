@@ -29,9 +29,9 @@ public class Player {
                     Table table = new Table();
                     AI ai = new AI();
                     System.out.println("Pick a place to set 'O'  by row and column");
-                    System.out.print("Enter row (0-4): ");
+                    System.out.print("Enter row (0-"+(SIZE-1)+"): ");
                     row = scanner.nextInt();
-                    System.out.print("Enter column (0-4): ");
+                    System.out.print("Enter column (0-"+(SIZE-1)+"): ");
                     col = scanner.nextInt();
                     if (table.isAvailable(row, col)) {
                         table.setO(row, col);
@@ -39,7 +39,6 @@ public class Player {
                         System.out.println("Space is taken!");
                         break;
                     }
-                    System.out.println("SCORE: "+AI.getScore());
                     ai.setX();
                     checkWin('O');
                     checkWin('X');
